@@ -231,16 +231,24 @@ class Archive(object):
                 argument.append(line)
                 if start_braces == end_braces:
                     break
-        if not argument or start_braces == 0:
+
+        if not argument:
             return []
-        else:
-            argument[0] = argument[0][argument[0].find('['):]
-            argument[-1] = argument[-1][:argument[-1].rfind(']')+1]
-            argument[-1] = argument[-1].rstrip().rstrip(',')
-            try:
-                return eval(' '.join(argument).strip())
-            except: # something unparsable in the list - different errors can come out - function undefined, syntax error, ...
-                return []
+        elif start_braces == 0:
+            sub_argument = argument[0].split(setup_argument)[-1].split("=")[-1]
+            if "," in sub_argument[-1]:
+                sub_argument = sub_argument[:-1]
+            if sub_argument.startswith("_") or sub_argument[0].isalpha() is True:
+                dep_list = self.find_list_argument(sub_argument)
+                return dep_list
+
+        argument[0] = argument[0][argument[0].find('['):]
+        argument[-1] = argument[-1][:argument[-1].rfind(']')+1]
+        argument[-1] = argument[-1].rstrip().rstrip(',')
+        try:
+            return eval(' '.join(argument).strip())
+        except: # something unparsable in the list - different errors can come out - function undefined, syntax error, ...
+            return []
 
     def has_argument(self, argument):
         """A simple method that finds out if setup() function from setup.py is called with given argument.
