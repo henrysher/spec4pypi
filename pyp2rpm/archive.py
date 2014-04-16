@@ -218,6 +218,7 @@ class Archive(object):
 
 
         start_braces = end_braces = 0
+        start_tuple = end_tuple = 0
         cont = False
 
         for line in setup_py.splitlines():
@@ -226,15 +227,16 @@ class Archive(object):
                    line = line.split("#")[0]
                 start_braces += line.count('[')
                 end_braces += line.count(']')
+                start_tuple += line.count('(')
+                end_tuple += line.count(')')
 
                 cont = True
                 argument.append(line)
-                if start_braces == end_braces:
+                if start_braces == end_braces and start_tuple == end_tuple:
                     break
-
         if not argument:
             return []
-        elif start_braces == 0:
+        elif start_braces == 0 and start_tuple == 0:
             sub_argument = argument[0].split(setup_argument)[-1].split("=")[-1]
             if "," in sub_argument[-1]:
                 sub_argument = sub_argument[:-1]
@@ -242,9 +244,14 @@ class Archive(object):
                 dep_list = self.find_list_argument(sub_argument)
                 return dep_list
 
-        argument[0] = argument[0][argument[0].find('['):]
-        argument[-1] = argument[-1][:argument[-1].rfind(']')+1]
-        argument[-1] = argument[-1].rstrip().rstrip(',')
+        if start_braces > 0:
+            argument[0] = argument[0][argument[0].find('['):]
+            argument[-1] = argument[-1][:argument[-1].rfind(']')+1]
+            argument[-1] = argument[-1].rstrip().rstrip(',')
+        if start_tuple > 0:
+            argument[0] = argument[0][argument[0].find('('):]
+            argument[-1] = argument[-1][:argument[-1].rfind(')')+1]
+            argument[-1] = argument[-1].rstrip().rstrip(',')
         try:
             return eval(' '.join(argument).strip())
         except: # something unparsable in the list - different errors can come out - function undefined, syntax error, ...
