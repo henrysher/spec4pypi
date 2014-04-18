@@ -231,7 +231,7 @@ class PypiMetadataExtractor(LocalMetadataExtractor):
 
         if len(release_urls) > 0:
             for release_url in release_urls:
-                if release_url['url'].endswith("tar.gz"):
+                if release_url['url'].endswith("tar.gz") or release_url['url'].endswith("zip"):
                     url = release_url['url']
                     md5_digest = release_url['md5_digest']
             if url == '':
