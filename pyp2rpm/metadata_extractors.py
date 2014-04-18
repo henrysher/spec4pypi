@@ -122,7 +122,10 @@ class LocalMetadataExtractor(object):
 
     @property
     def license_from_setup_py(self):
-        return utils.license_from_trove(self.archive.find_list_argument('classifiers'))
+        license = utils.license_from_trove(self.archive.find_list_argument('classifiers'))
+        if not license:
+            license = self.archive.find_string_argument('license')
+        return license
 
     @property
     def license_from_egg_info(self):

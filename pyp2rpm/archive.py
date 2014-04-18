@@ -257,6 +257,70 @@ class Archive(object):
         except: # something unparsable in the list - different errors can come out - function undefined, syntax error, ...
             return []
 
+    def find_string_argument(self, setup_argument):
+        """A simple method that gets setup() function from setup.py string argument like license.
+
+        Args:
+            setup_argument: name of the argument of setup() function to get value of
+        Returns:
+            The requested setup() argument or empty string, if setup.py can't be open (or argument is not present).
+        """
+        argument = []
+        cont = False
+        setup_cfg = self.get_content_of_file('setup.cfg')
+        if setup_cfg:
+            argument_re = re.compile(r'\b' + format(setup_argument) +'\s*=')
+            for line in setup_cfg.splitlines():
+                if line.find("#") != -1:
+                   line = line.split("#")[0]
+                if argument_re.search(line):
+                   args = line.split("=")
+                   if len(args) > 1:
+                       argument.append(args[1])
+                   cont = True
+                   continue
+                if cont and len(line) > 0 and line[0] in string.whitespace:
+                   argument.append(line.strip())
+                   continue
+                if cont:
+                   return argument
+
+        setup_py = self.get_content_of_file('setup.py') # TODO: construct absolute path here?
+        if not setup_py: return []
+
+
+        start_string = end_string = 0
+        cont = False
+
+        for line in setup_py.splitlines():
+            if setup_argument in line or cont:
+                if line.find("#") != -1:
+                   line = line.split("#")[0]
+                start_string += line.count("'")
+                end_string += line.count("'")
+
+                cont = True
+                argument.append(line)
+                if start_string == end_string:
+                    break
+        if not argument:
+            return ""
+        elif start_string == 0:
+            sub_argument = argument[0].split(setup_argument)[-1].split("=")[-1]
+            if "," in sub_argument[-1]:
+                sub_argument = sub_argument[:-1]
+            if sub_argument.startswith("_") or sub_argument[0].isalpha() is True:
+                return self.find_string_argument(sub_argument)
+
+        if start_string > 0:
+            argument[0] = argument[0][argument[0].find("'"):]
+            argument[-1] = argument[-1][:argument[-1].rfind("'")+1]
+            argument[-1] = argument[-1].rstrip().rstrip(',')
+        try:
+            return eval(' '.join(argument).strip())
+        except: # something unparsable in the list - different errors can come out - function undefined, syntax error, ...
+            return ""
+
     def has_argument(self, argument):
         """A simple method that finds out if setup() function from setup.py is called with given argument.
         Args:
