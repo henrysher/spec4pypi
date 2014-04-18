@@ -25,6 +25,7 @@ def license_from_trove(trove):
     """
     license = []
     for classifier in trove:
+        if classifier is None: continue
         if 'License' in classifier != -1:
             stripped = classifier.strip()
             # if taken from EGG-INFO, begins with Classifier:
