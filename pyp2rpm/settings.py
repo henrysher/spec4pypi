@@ -49,6 +49,7 @@ TROVE_LICENSES = {'License :: OSI Approved :: Academic Free License (AFL)': 'AFL
                   'License :: OSI Approved :: Nethack General Public License': 'NGPL',
                   'License :: OSI Approved :: Nokia Open Source License': 'Nokia',
                   'License :: OSI Approved :: Open Group Test Suite License': 'Open Group Test Suite License - Flawed (BAD)',
+                  'License :: OSI Approved :: Open Software License': 'Open Software License',
                   'License :: OSI Approved :: Python License (CNRI Python License)': 'CNRI',
                   'License :: OSI Approved :: Python Software Foundation License': 'Python',
                   'License :: OSI Approved :: Qt Public License (QPL)': 'QPL',
