@@ -229,20 +229,24 @@ class Archive(object):
                 end_braces += line.count(']')
                 start_tuple += line.count('(')
                 end_tuple += line.count(')')
-
                 cont = True
                 argument.append(line)
                 if start_braces == end_braces and start_tuple == end_tuple:
-                    break
+                    if start_braces > 0 or start_tuple > 0:
+                        break
+                    else:
+                        cont = False
+                        argument.pop()
         if not argument:
             return []
         elif start_braces == 0 and start_tuple == 0:
             sub_argument = argument[0].split(setup_argument)[-1].split("=")[-1]
-            if "," in sub_argument[-1]:
-                sub_argument = sub_argument[:-1]
-            if sub_argument.startswith("_") or sub_argument[0].isalpha() is True:
-                dep_list = self.find_list_argument(sub_argument)
-                return dep_list
+            if sub_argument and len(sub_argument) > 0:
+                if "," in sub_argument[-1]:
+                    sub_argument = sub_argument[:-1]
+                if sub_argument.startswith("_") or sub_argument[0].isalpha() is True:
+                    dep_list = self.find_list_argument(sub_argument)
+                    return dep_list
 
         if start_braces > 0:
             argument[0] = argument[0][argument[0].find('['):]
