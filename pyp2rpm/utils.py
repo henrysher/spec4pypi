@@ -32,6 +32,4 @@ def license_from_trove(trove):
             stripped = stripped[stripped.find('License'):]
             if stripped in settings.TROVE_LICENSES:
                 license.append(settings.TROVE_LICENSES[stripped])
-            else:
-                license.append("Unknown License")
     return ' and '.join(license)
